@@ -117,25 +117,72 @@ if __name__ == "__main__":
 
     cap = cv2.VideoCapture(1)
 
+    ROLL_REFERENCE = 90
+    print(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    print(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
     while cap.isOpened():
+
         start_time = time.time()
         success, image = cap.read()
         if not success:
             print("Ignoring empty camera frame")
             continue
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        # image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
         image.flags.writeable = False
-        image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+        # image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
         results = _face_mesh.process(image)
         key_points = get_points(image)
         if key_points:
             roll = round(get_roll(key_points))
             yaw = round(get_yaw(key_points))
             pitch = round(get_pitch(key_points))
+            # Roll
+            roll_position = (lambda: "Hombro derecho" if roll < 90 else "Hombro izquierdo" if roll > 90 else "Derecho")
             cv2.putText(
                 image,
                 f"Roll: {roll}",
+                (10, 200),
+                cv2.FONT_ITALIC,
+                0.7,
+                (255, 0, 0),
+                2
+            )
+            cv2.putText(
+                image,
+                roll_position(),
+                (20, 225),
+                cv2.FONT_ITALIC,
+                0.7,
+                (0, 0, 255),
+                2
+            )
+            # Yaw
+            yaw_position = (lambda: "Izquierda" if yaw < 90 else "Derecha" if yaw > 90 else "Frente")
+            cv2.putText(
+                image,
+                f"Yaw: {yaw}",
+                (10, 250),
+                cv2.FONT_ITALIC,
+                0.7,
+                (255, 0, 0),
+                2
+            )
+            cv2.putText(
+                image,
+                yaw_position(),
+                (20, 275),
+                cv2.FONT_ITALIC,
+                0.7,
+                (0, 0, 255),
+                2
+            )
+            # Pitch
+            pitch_position = (lambda: "Abajo" if pitch < 90 else "Arriba" if pitch > 90 else "Frente")
+            cv2.putText(
+                image,
+                f"Pitch: {pitch}",
                 (10, 300),
                 cv2.FONT_ITALIC,
                 0.7,
@@ -144,24 +191,16 @@ if __name__ == "__main__":
             )
             cv2.putText(
                 image,
-                f"Yaw: {yaw}",
-                (10, 325),
+                pitch_position(),
+                (20, 325),
                 cv2.FONT_ITALIC,
                 0.7,
-                (255, 0, 0),
-                2
-            )
-            cv2.putText(
-                image,
-                f"Pitch: {pitch}",
-                (10, 350),
-                cv2.FONT_ITALIC,
-                0.7,
-                (255, 0, 0),
+                (0, 0, 255),
                 2
             )
 
         if results.multi_face_landmarks:
+            image_rows, image_cols, _ = image.shape
             for face_landmarks in results.multi_face_landmarks:
                 mp_drawing.draw_landmarks(
                     image=image,
@@ -170,6 +209,15 @@ if __name__ == "__main__":
                     landmark_drawing_spec=drawing_spec,
                     connection_drawing_spec=drawing_spec
                 )
+                for landmark in face_landmarks.landmark:
+                    landmark_px = mp_drawing._normalized_to_pixel_coordinates(
+                        landmark.x,
+                        landmark.y,
+                        image_cols,
+                        image_rows
+                    )
+                    cv2.circle(image, (landmark_px[0]+round(640/480), landmark_px[1]), 1,
+                               (255, 0, 0), 1)
 
         fps = f"FPS: {round(1.0 / (time.time() - start_time))}"
         cv2.putText(
