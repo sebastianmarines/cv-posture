@@ -71,7 +71,13 @@ def list_to_vector(_points: List[Point]) -> str:
     return _vector
 
 
-def get_roll(_points: np.ndarray) -> float:
+def angle_between_vectors(v1: np.ndarray, v2: np.ndarray) -> int:
+    cos_a = np.sum(v1 * v2) / (norm(v1) * norm(v2))
+    angle = degrees(acos(cos_a))
+    return round(angle)
+
+
+def get_roll(_points: np.ndarray) -> int:
     forehead, chin, *_ = _points
     # Calcular vector de la frente a la barbilla
     face_vector = chin - forehead
@@ -79,30 +85,25 @@ def get_roll(_points: np.ndarray) -> float:
     ref_point = np.array([0, forehead[1], 0])
     ref_vector = ref_point - forehead
 
-    cos_a = np.sum(face_vector * ref_vector) / (norm(face_vector) * norm(ref_vector))
-    angle = degrees(acos(cos_a))
-    return angle
+    return angle_between_vectors(face_vector, ref_vector)
 
 
-def get_yaw(_points: List[Point]) -> float:
+def get_yaw(_points: np.ndarray) -> int:
     *_, right_ear, left_ear = _points
-    face_vector = Vector.from_two_points(left_ear, right_ear)
-    ref_point = Point(right_ear.x, 0, 0)
-    ref_vector = Vector.from_two_points(ref_point, right_ear)
+    face_vector = left_ear - right_ear
+    ref_point = np.array([right_ear[0], 0, 0])
+    ref_vector = ref_point - right_ear
 
-    cos_a = (face_vector * ref_vector) / (face_vector.magnitude() * ref_vector.magnitude())
-    angle = degrees(acos(cos_a))
-    return angle
+    return angle_between_vectors(face_vector, ref_vector)
 
 
-def get_pitch(_points: List[Point]) -> float:
+def get_pitch(_points: np.ndarray) -> int:
     forehead, chin, *_ = _points
-    face_vector = Vector.from_two_points(chin, forehead)
-    ref_point = Point(0, forehead.y, forehead.z + 5)  # arbitrary number just to make a vector
-    ref_vector = Vector.from_two_points(ref_point, forehead)
-    cos_a = (face_vector * ref_vector) / (face_vector.magnitude() * ref_vector.magnitude())
-    angle = degrees(acos(cos_a))
-    return angle
+    face_vector = chin - forehead
+    ref_point = np.array([0, forehead[1], forehead[2] + 5])  # arbitrary number just to make a vector
+    ref_vector = ref_point - forehead
+
+    return angle_between_vectors(face_vector, ref_vector)
 
 
 if __name__ == "__main__":
@@ -135,9 +136,9 @@ if __name__ == "__main__":
         # results = _face_mesh.process(image)
         point_list = get_points(image)
         if point_list is not False:
-            roll = round(get_roll(point_list[1]))
-        #     yaw = round(get_yaw(point_list))
-        #     pitch = round(get_pitch(point_list))
+            roll = get_roll(point_list[1])
+            yaw = get_yaw(point_list[1])
+            pitch = get_pitch(point_list[1])
             # Roll
             roll_position = (lambda: "Hombro derecho" if roll < 90 else "Hombro izquierdo" if roll > 90 else "Derecho")
             cv2.putText(
@@ -158,46 +159,46 @@ if __name__ == "__main__":
                 (0, 0, 255),
                 2
             )
-        #     # Yaw
-        #     yaw_position = (lambda: "Izquierda" if yaw < 90 else "Derecha" if yaw > 90 else "Frente")
-        #     cv2.putText(
-        #         image,
-        #         f"Yaw: {yaw}",
-        #         (10, 250),
-        #         cv2.FONT_ITALIC,
-        #         0.7,
-        #         (255, 0, 0),
-        #         2
-        #     )
-        #     cv2.putText(
-        #         image,
-        #         yaw_position(),
-        #         (20, 275),
-        #         cv2.FONT_ITALIC,
-        #         0.7,
-        #         (0, 0, 255),
-        #         2
-        #     )
-        #     # Pitch
-        #     pitch_position = (lambda: "Abajo" if pitch < 90 else "Arriba" if pitch > 90 else "Frente")
-        #     cv2.putText(
-        #         image,
-        #         f"Pitch: {pitch}",
-        #         (10, 300),
-        #         cv2.FONT_ITALIC,
-        #         0.7,
-        #         (255, 0, 0),
-        #         2
-        #     )
-        #     cv2.putText(
-        #         image,
-        #         pitch_position(),
-        #         (20, 325),
-        #         cv2.FONT_ITALIC,
-        #         0.7,
-        #         (0, 0, 255),
-        #         2
-        #     )
+            # Yaw
+            yaw_position = (lambda: "Izquierda" if yaw < 90 else "Derecha" if yaw > 90 else "Frente")
+            cv2.putText(
+                image,
+                f"Yaw: {yaw}",
+                (10, 250),
+                cv2.FONT_ITALIC,
+                0.7,
+                (255, 0, 0),
+                2
+            )
+            cv2.putText(
+                image,
+                yaw_position(),
+                (20, 275),
+                cv2.FONT_ITALIC,
+                0.7,
+                (0, 0, 255),
+                2
+            )
+            # Pitch
+            pitch_position = (lambda: "Abajo" if pitch < 90 else "Arriba" if pitch > 90 else "Frente")
+            cv2.putText(
+                image,
+                f"Pitch: {pitch}",
+                (10, 300),
+                cv2.FONT_ITALIC,
+                0.7,
+                (255, 0, 0),
+                2
+            )
+            cv2.putText(
+                image,
+                pitch_position(),
+                (20, 325),
+                cv2.FONT_ITALIC,
+                0.7,
+                (0, 0, 255),
+                2
+            )
 
         if point_list is not False:
             image_rows, image_cols, _ = image.shape
