@@ -92,7 +92,7 @@ def face_area(face_points: np.ndarray) -> int:
     """
     Calculate the area as if it was a diamond
 
-    :param face_points: A numpy array containing 4 keypoints
+    :param face_points: A numpy array containing 4 pixel coordinates of keypoints
     :return: Area in pixels
     """
     forehead, chin, right, left = face_points
