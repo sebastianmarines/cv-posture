@@ -10,6 +10,8 @@ import mediapipe as mp
 import numpy as np
 from numpy.linalg import norm
 
+from utils import normalized_to_pixel_coordinates
+
 POINTS = (
     10,  # Frente
     152,  # Barbilla
@@ -29,17 +31,15 @@ def get_points(target_img) -> Union[bool, np.ndarray[np.ndarray, np.ndarray, np.
         _point = np.array([point.x, point.y, point.z])
         _points[index] = _point
 
-    _keypoints = np.zeros((4, 3))
-    _keypoints_abs_coordinates = np.zeros((4, 2))
-    for index, point in enumerate(POINTS):
-        _keypoints[index] = _points[point]
-        landmark_px = mp_drawing._normalized_to_pixel_coordinates(
-            _keypoints[index, 0],
-            _keypoints[index, 1],
-            image_cols,
-            image_rows
-        )
-        _keypoints_abs_coordinates[index] = landmark_px
+        for index, point in enumerate(POINTS):
+            _keypoints[index] = _points[point]
+            _landmark_px = normalized_to_pixel_coordinates(
+                _keypoints[index, 0],
+                _keypoints[index, 1],
+                image_cols,
+                image_rows
+            )
+            _keypoints_abs_coordinates[index] = _landmark_px
 
     return np.array([_points, _keypoints, _keypoints_abs_coordinates], dtype=object)
 
@@ -203,16 +203,8 @@ if __name__ == "__main__":
 
         if point_list is not False:
             image_rows, image_cols, _ = image.shape
-            for face_landmarks in point_list[0]:
-                # mp_drawing.draw_landmarks(
-                #     image=image,
-                #     landmark_list=face_landmarks,
-                #     connections=mp_face_mesh.FACE_CONNECTIONS,
-                #     landmark_drawing_spec=drawing_spec,
-                #     connection_drawing_spec=drawing_spec
-                # )
-
-                landmark_px = mp_drawing._normalized_to_pixel_coordinates(
+            for face_landmarks in face:
+                landmark_px = normalized_to_pixel_coordinates(
                     face_landmarks[0],
                     face_landmarks[1],
                     image_cols,
