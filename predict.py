@@ -4,6 +4,7 @@ import time
 from math import acos, degrees
 from typing import Union, Tuple
 
+import pretty_errors
 import cv2
 import mediapipe as mp
 import numpy as np
@@ -17,7 +18,8 @@ POINTS = (
 )
 
 
-def get_points(target_img) -> Union[bool, np.ndarray[np.ndarray, np.ndarray]]:
+def get_points(target_img) -> Union[bool, np.ndarray[np.ndarray, np.ndarray, np.ndarray]]:
+    image_rows, image_cols, _ = image.shape
     result = face_mesh.process(cv2.cvtColor(target_img, cv2.COLOR_BGR2RGB))
     if not result.multi_face_landmarks:
         return False
@@ -28,10 +30,18 @@ def get_points(target_img) -> Union[bool, np.ndarray[np.ndarray, np.ndarray]]:
         _points[index] = _point
 
     _keypoints = np.zeros((4, 3))
+    _keypoints_abs_coordinates = np.zeros((4, 2))
     for index, point in enumerate(POINTS):
         _keypoints[index] = _points[point]
+        landmark_px = mp_drawing._normalized_to_pixel_coordinates(
+            _keypoints[index, 0],
+            _keypoints[index, 1],
+            image_cols,
+            image_rows
+        )
+        _keypoints_abs_coordinates[index] = landmark_px
 
-    return np.array([_points, _keypoints], dtype=object)
+    return np.array([_points, _keypoints, _keypoints_abs_coordinates], dtype=object)
 
 
 def angle_between_vectors(v1: np.ndarray, v2: np.ndarray) -> int:
@@ -76,20 +86,17 @@ def face_area(face_points: np.ndarray) -> int:
     :param face_points:
     :return: int
     """
-    # TODO: Calculate the area with the real image coordinates
-    keypoints_2d = np.delete(
-        face_points,
-        obj=2,  # Z index
-        axis=1
-    )
-    forehead, chin, right, left = keypoints_2d
+    forehead, chin, right, left = face_points
     dp = norm(chin - forehead)
     ds = norm(left - right)
 
-    return round((dp * ds) / 2, 4)
+    if not np.isnan(dp) and not np.isnan(ds):
+        return round((dp * ds) / 2)
+    return 0
 
 
 if __name__ == "__main__":
+    pretty_errors.replace_stderr()
     mp_drawing = mp.solutions.drawing_utils
     mp_face_mesh = mp.solutions.face_mesh
     drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
@@ -102,8 +109,8 @@ if __name__ == "__main__":
     cap = cv2.VideoCapture(1)
 
     ROLL_REFERENCE = 90
-    print(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-    print(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    # print(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    # print(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
     while cap.isOpened():
 
@@ -122,7 +129,7 @@ if __name__ == "__main__":
             roll = get_roll(point_list[1])
             yaw = get_yaw(point_list[1])
             pitch = get_pitch(point_list[1])
-            area = face_area(point_list[1])
+            area = face_area(point_list[2])
             # Roll
             roll_position = (lambda: "Hombro derecho" if roll < 90 else "Hombro izquierdo" if roll > 90 else "Derecho")
             cv2.putText(
