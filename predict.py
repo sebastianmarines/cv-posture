@@ -1,15 +1,14 @@
 from __future__ import annotations
 
 import time
-from math import sqrt, acos, degrees
-from typing import List, Union, NamedTuple
+from math import acos, degrees
+from typing import Union
 
 import cv2
 import mediapipe as mp
 import numpy as np
 from numpy.linalg import norm
 
-_mp_face_mesh = mp.solutions.face_mesh
 
 POINTS = (
     10,  # Frente
@@ -19,34 +18,8 @@ POINTS = (
 )
 
 
-class Point(NamedTuple):
-    x: float
-    y: float
-    z: float
-
-    def to_mathematica_vector_representation(self, max_decimals=10) -> str:
-        return f"{{{round(self.x, max_decimals)}, {round(self.y, max_decimals)}, {round(self.z, max_decimals)}}}"
-
-
-class Vector:
-    def __init__(self, x=0.0, y=0.0, z=0.0):
-        self.x = x
-        self.y = y
-        self.z = z
-
-    @classmethod
-    def from_two_points(cls, p1: Point, p2: Point) -> Vector:
-        return cls(p1.x - p2.x, p1.y - p2.y, p1.z - p2.z)
-
-    def magnitude(self) -> float:
-        return sqrt(self.x ** 2 + self.y ** 2 + self.z ** 2)
-
-    def __mul__(self, other) -> float:
-        return self.x * other.x + self.y * other.y + self.z * other.z
-
-
 def get_points(target_img) -> Union[bool, np.ndarray[np.ndarray, np.ndarray]]:
-    result = _face_mesh.process(cv2.cvtColor(target_img, cv2.COLOR_BGR2RGB))
+    result = face_mesh.process(cv2.cvtColor(target_img, cv2.COLOR_BGR2RGB))
     if not result.multi_face_landmarks:
         return False
 
@@ -60,15 +33,6 @@ def get_points(target_img) -> Union[bool, np.ndarray[np.ndarray, np.ndarray]]:
         _keypoints[index] = _points[point]
 
     return np.array([_points, _keypoints], dtype=object)
-
-
-def list_to_vector(_points: List[Point]) -> str:
-    _vector = "{"
-    for _point in _points:
-        _vector += _point.to_mathematica_vector_representation() + ","
-    _vector = _vector.rstrip(",")
-    _vector += "}"
-    return _vector
 
 
 def angle_between_vectors(v1: np.ndarray, v2: np.ndarray) -> int:
@@ -110,7 +74,7 @@ if __name__ == "__main__":
     mp_drawing = mp.solutions.drawing_utils
     mp_face_mesh = mp.solutions.face_mesh
     drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
-    _face_mesh = _mp_face_mesh.FaceMesh(
+    face_mesh = mp_face_mesh.FaceMesh(
         max_num_faces=1,
         min_detection_confidence=0.5,
         min_tracking_confidence=0.5
@@ -235,5 +199,5 @@ if __name__ == "__main__":
         if cv2.waitKey(5) & 0xFF == 27:
             break
 
-    _face_mesh.close()
+    face_mesh.close()
     cap.release()
