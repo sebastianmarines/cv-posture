@@ -2,13 +2,12 @@ from __future__ import annotations
 
 import time
 from math import acos, degrees
-from typing import Union
+from typing import Union, Tuple
 
 import cv2
 import mediapipe as mp
 import numpy as np
 from numpy.linalg import norm
-
 
 POINTS = (
     10,  # Frente
@@ -41,8 +40,8 @@ def angle_between_vectors(v1: np.ndarray, v2: np.ndarray) -> int:
     return round(angle)
 
 
-def get_roll(_points: np.ndarray) -> int:
-    forehead, chin, *_ = _points
+def get_roll(face_points: np.ndarray) -> int:
+    forehead, chin, *_ = face_points
     # Calcular vector de la frente a la barbilla
     face_vector = chin - forehead
     # Calcular vector de referencia
@@ -52,8 +51,8 @@ def get_roll(_points: np.ndarray) -> int:
     return angle_between_vectors(face_vector, ref_vector)
 
 
-def get_yaw(_points: np.ndarray) -> int:
-    *_, right_ear, left_ear = _points
+def get_yaw(face_points: np.ndarray) -> int:
+    *_, right_ear, left_ear = face_points
     face_vector = left_ear - right_ear
     ref_point = np.array([right_ear[0], 0, 0])
     ref_vector = ref_point - right_ear
@@ -61,13 +60,33 @@ def get_yaw(_points: np.ndarray) -> int:
     return angle_between_vectors(face_vector, ref_vector)
 
 
-def get_pitch(_points: np.ndarray) -> int:
-    forehead, chin, *_ = _points
+def get_pitch(face_points: np.ndarray) -> int:
+    forehead, chin, *_ = face_points
     face_vector = chin - forehead
     ref_point = np.array([0, forehead[1], forehead[2] + 5])  # arbitrary number just to make a vector
     ref_vector = ref_point - forehead
 
     return angle_between_vectors(face_vector, ref_vector)
+
+
+def face_area(face_points: np.ndarray) -> int:
+    """
+    Calculate the area as if it was a diamond
+
+    :param face_points:
+    :return: int
+    """
+    # TODO: Calculate the area with the real image coordinates
+    keypoints_2d = np.delete(
+        face_points,
+        obj=2,  # Z index
+        axis=1
+    )
+    forehead, chin, right, left = keypoints_2d
+    dp = norm(chin - forehead)
+    ds = norm(left - right)
+
+    return round((dp * ds) / 2, 4)
 
 
 if __name__ == "__main__":
@@ -103,6 +122,7 @@ if __name__ == "__main__":
             roll = get_roll(point_list[1])
             yaw = get_yaw(point_list[1])
             pitch = get_pitch(point_list[1])
+            area = face_area(point_list[1])
             # Roll
             roll_position = (lambda: "Hombro derecho" if roll < 90 else "Hombro izquierdo" if roll > 90 else "Derecho")
             cv2.putText(
@@ -161,6 +181,16 @@ if __name__ == "__main__":
                 cv2.FONT_ITALIC,
                 0.7,
                 (0, 0, 255),
+                2
+            )
+            # Area
+            cv2.putText(
+                image,
+                f"Area: {area}",
+                (10, 350),
+                cv2.FONT_ITALIC,
+                0.7,
+                (255, 0, 0),
                 2
             )
 
