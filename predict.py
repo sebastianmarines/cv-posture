@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import time
 from math import acos, degrees
-from typing import Union, Tuple
+from typing import Tuple
 
 import pretty_errors
 import cv2
@@ -20,16 +20,27 @@ POINTS = (
 )
 
 
-def get_points(target_img) -> Union[bool, np.ndarray[np.ndarray, np.ndarray, np.ndarray]]:
-    image_rows, image_cols, _ = image.shape
+def get_points(target_img: np.ndarray) -> Tuple[bool, np.ndarray, np.ndarray, np.ndarray]:
+    """
+    Processes an RGB image and returns the face landmarks on each detected face.
+
+    :param target_img: An RGB image represented as a numpy array.
+    :return: A tuple containing: status, 468 landmark points, 4 keypoints, and the keypoints
+    coordinates in pixels.
+    """
+    _image_rows, _image_cols, _ = image.shape
     result = face_mesh.process(cv2.cvtColor(target_img, cv2.COLOR_BGR2RGB))
-    if not result.multi_face_landmarks:
-        return False
 
     _points = np.zeros((468, 3))
-    for index, point in enumerate(result.multi_face_landmarks[0].landmark):
-        _point = np.array([point.x, point.y, point.z])
-        _points[index] = _point
+    _keypoints = np.zeros((4, 3))
+    _keypoints_abs_coordinates = np.zeros((4, 2))
+    _status = False
+
+    if result.multi_face_landmarks:
+        _status = True
+        for index, point in enumerate(result.multi_face_landmarks[0].landmark):
+            _point = np.array([point.x, point.y, point.z])
+            _points[index] = _point
 
         for index, point in enumerate(POINTS):
             _keypoints[index] = _points[point]
@@ -41,7 +52,7 @@ def get_points(target_img) -> Union[bool, np.ndarray[np.ndarray, np.ndarray, np.
             )
             _keypoints_abs_coordinates[index] = _landmark_px
 
-    return np.array([_points, _keypoints, _keypoints_abs_coordinates], dtype=object)
+    return _status, _points, _keypoints, _keypoints_abs_coordinates
 
 
 def angle_between_vectors(v1: np.ndarray, v2: np.ndarray) -> int:
@@ -122,14 +133,13 @@ if __name__ == "__main__":
         # image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
         image.flags.writeable = False
-        # image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-        # results = _face_mesh.process(image)
-        point_list = get_points(image)
-        if point_list is not False:
-            roll = get_roll(point_list[1])
-            yaw = get_yaw(point_list[1])
-            pitch = get_pitch(point_list[1])
-            area = face_area(point_list[2])
+        status, face, keypoints, keypoints_coords = get_points(image)
+
+        if status is not False:
+            roll = get_roll(keypoints)
+            yaw = get_yaw(keypoints)
+            pitch = get_pitch(keypoints)
+            area = face_area(keypoints_coords)
             # Roll
             roll_position = (lambda: "Hombro derecho" if roll < 90 else "Hombro izquierdo" if roll > 90 else "Derecho")
             cv2.putText(
@@ -201,7 +211,7 @@ if __name__ == "__main__":
                 2
             )
 
-        if point_list is not False:
+        if status is not False:
             image_rows, image_cols, _ = image.shape
             for face_landmarks in face:
                 landmark_px = normalized_to_pixel_coordinates(
