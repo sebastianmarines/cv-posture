@@ -6,13 +6,13 @@ from typing import List, Union, NamedTuple
 
 import cv2
 import mediapipe as mp
+import numpy as np
 
 _mp_face_mesh = mp.solutions.face_mesh
 
-points = (
+POINTS = (
     10,  # Frente
     152,  # Barbilla
-    # 1,  # Nariz
     93,  # Derecha
     323  # Izquierda
 )
@@ -44,22 +44,21 @@ class Vector:
         return self.x * other.x + self.y * other.y + self.z * other.z
 
 
-def get_points(target_img, show_all: bool = False) -> Union[bool, List[Point]]:
+def get_points(target_img) -> Union[bool, np.ndarray[np.ndarray, np.ndarray]]:
     result = _face_mesh.process(cv2.cvtColor(target_img, cv2.COLOR_BGR2RGB))
     if not result.multi_face_landmarks:
         return False
-    _points: List[Point] = []
-    if show_all:
-        for landmark in result.multi_face_landmarks[0].landmark:
-            _point = Point(landmark.x, landmark.y, landmark.z)
-            _points.append(_point)
-    else:
-        for point in points:
-            landmark = result.multi_face_landmarks[0].landmark[point]
-            _point = Point(landmark.x, landmark.y, landmark.z)
-            _points.append(_point)
 
-    return _points
+    _points = np.zeros((468, 3))
+    for index, point in enumerate(result.multi_face_landmarks[0].landmark):
+        _point = np.array([point.x, point.y, point.z])
+        _points[index] = _point
+
+    _keypoints = np.zeros((4, 3))
+    for index, point in enumerate(POINTS):
+        _keypoints[index] = point
+
+    return np.array([_points, _keypoints], dtype=object)
 
 
 def list_to_vector(_points: List[Point]) -> str:
@@ -132,92 +131,92 @@ if __name__ == "__main__":
 
         image.flags.writeable = False
         # image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-        results = _face_mesh.process(image)
-        key_points = get_points(image)
-        if key_points:
-            roll = round(get_roll(key_points))
-            yaw = round(get_yaw(key_points))
-            pitch = round(get_pitch(key_points))
-            # Roll
-            roll_position = (lambda: "Hombro derecho" if roll < 90 else "Hombro izquierdo" if roll > 90 else "Derecho")
-            cv2.putText(
-                image,
-                f"Roll: {roll}",
-                (10, 200),
-                cv2.FONT_ITALIC,
-                0.7,
-                (255, 0, 0),
-                2
-            )
-            cv2.putText(
-                image,
-                roll_position(),
-                (20, 225),
-                cv2.FONT_ITALIC,
-                0.7,
-                (0, 0, 255),
-                2
-            )
-            # Yaw
-            yaw_position = (lambda: "Izquierda" if yaw < 90 else "Derecha" if yaw > 90 else "Frente")
-            cv2.putText(
-                image,
-                f"Yaw: {yaw}",
-                (10, 250),
-                cv2.FONT_ITALIC,
-                0.7,
-                (255, 0, 0),
-                2
-            )
-            cv2.putText(
-                image,
-                yaw_position(),
-                (20, 275),
-                cv2.FONT_ITALIC,
-                0.7,
-                (0, 0, 255),
-                2
-            )
-            # Pitch
-            pitch_position = (lambda: "Abajo" if pitch < 90 else "Arriba" if pitch > 90 else "Frente")
-            cv2.putText(
-                image,
-                f"Pitch: {pitch}",
-                (10, 300),
-                cv2.FONT_ITALIC,
-                0.7,
-                (255, 0, 0),
-                2
-            )
-            cv2.putText(
-                image,
-                pitch_position(),
-                (20, 325),
-                cv2.FONT_ITALIC,
-                0.7,
-                (0, 0, 255),
-                2
-            )
+        # results = _face_mesh.process(image)
+        point_list = get_points(image)
+        # if point_list:
+        #     roll = round(get_roll(point_list))
+        #     yaw = round(get_yaw(point_list))
+        #     pitch = round(get_pitch(point_list))
+        #     # Roll
+        #     roll_position = (lambda: "Hombro derecho" if roll < 90 else "Hombro izquierdo" if roll > 90 else "Derecho")
+        #     cv2.putText(
+        #         image,
+        #         f"Roll: {roll}",
+        #         (10, 200),
+        #         cv2.FONT_ITALIC,
+        #         0.7,
+        #         (255, 0, 0),
+        #         2
+        #     )
+        #     cv2.putText(
+        #         image,
+        #         roll_position(),
+        #         (20, 225),
+        #         cv2.FONT_ITALIC,
+        #         0.7,
+        #         (0, 0, 255),
+        #         2
+        #     )
+        #     # Yaw
+        #     yaw_position = (lambda: "Izquierda" if yaw < 90 else "Derecha" if yaw > 90 else "Frente")
+        #     cv2.putText(
+        #         image,
+        #         f"Yaw: {yaw}",
+        #         (10, 250),
+        #         cv2.FONT_ITALIC,
+        #         0.7,
+        #         (255, 0, 0),
+        #         2
+        #     )
+        #     cv2.putText(
+        #         image,
+        #         yaw_position(),
+        #         (20, 275),
+        #         cv2.FONT_ITALIC,
+        #         0.7,
+        #         (0, 0, 255),
+        #         2
+        #     )
+        #     # Pitch
+        #     pitch_position = (lambda: "Abajo" if pitch < 90 else "Arriba" if pitch > 90 else "Frente")
+        #     cv2.putText(
+        #         image,
+        #         f"Pitch: {pitch}",
+        #         (10, 300),
+        #         cv2.FONT_ITALIC,
+        #         0.7,
+        #         (255, 0, 0),
+        #         2
+        #     )
+        #     cv2.putText(
+        #         image,
+        #         pitch_position(),
+        #         (20, 325),
+        #         cv2.FONT_ITALIC,
+        #         0.7,
+        #         (0, 0, 255),
+        #         2
+        #     )
 
-        if results.multi_face_landmarks:
+        if not point_list.size == 0:
             image_rows, image_cols, _ = image.shape
-            for face_landmarks in results.multi_face_landmarks:
-                mp_drawing.draw_landmarks(
-                    image=image,
-                    landmark_list=face_landmarks,
-                    connections=mp_face_mesh.FACE_CONNECTIONS,
-                    landmark_drawing_spec=drawing_spec,
-                    connection_drawing_spec=drawing_spec
+            for face_landmarks in point_list[0]:
+                # mp_drawing.draw_landmarks(
+                #     image=image,
+                #     landmark_list=face_landmarks,
+                #     connections=mp_face_mesh.FACE_CONNECTIONS,
+                #     landmark_drawing_spec=drawing_spec,
+                #     connection_drawing_spec=drawing_spec
+                # )
+
+                landmark_px = mp_drawing._normalized_to_pixel_coordinates(
+                    face_landmarks[0],
+                    face_landmarks[1],
+                    image_cols,
+                    image_rows
                 )
-                for landmark in face_landmarks.landmark:
-                    landmark_px = mp_drawing._normalized_to_pixel_coordinates(
-                        landmark.x,
-                        landmark.y,
-                        image_cols,
-                        image_rows
-                    )
-                    cv2.circle(image, (landmark_px[0]+round(640/480), landmark_px[1]), 1,
-                               (255, 0, 0), 1)
+                cv2.circle(image, landmark_px, 1,
+                           (255, 0, 0), 1)
 
         fps = f"FPS: {round(1.0 / (time.time() - start_time))}"
         cv2.putText(
