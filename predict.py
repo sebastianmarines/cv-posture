@@ -27,7 +27,7 @@ def get_points(target_img: np.ndarray) -> Tuple[bool, np.ndarray, np.ndarray, np
     :return: A tuple containing: status, 468 landmark points, 4 keypoints, and the keypoints
     coordinates in pixels.
     """
-    _image_rows, _image_cols, _ = image.shape
+    _image_rows, _image_cols, _ = target_img.shape
     result = face_mesh.process(cv2.cvtColor(target_img, cv2.COLOR_BGR2RGB))
 
     _points = np.zeros((468, 3))
@@ -46,8 +46,8 @@ def get_points(target_img: np.ndarray) -> Tuple[bool, np.ndarray, np.ndarray, np
             _landmark_px = normalized_to_pixel_coordinates(
                 _keypoints[index, 0],
                 _keypoints[index, 1],
-                image_cols,
-                image_rows
+                _image_cols,
+                _image_rows
             )
             _keypoints_abs_coordinates[index] = _landmark_px
 
