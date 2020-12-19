@@ -13,10 +13,10 @@ from numpy.linalg import norm
 from utils import normalized_to_pixel_coordinates
 
 POINTS = (
-    10,  # Frente
-    152,  # Barbilla
-    93,  # Derecha
-    323  # Izquierda
+    10,  # Forehead
+    152,  # Chin
+    93,  # Right
+    323  # Left
 )
 
 
