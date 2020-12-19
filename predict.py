@@ -63,9 +63,7 @@ def angle_between_vectors(v1: np.ndarray, v2: np.ndarray) -> int:
 
 def get_roll(face_points: np.ndarray) -> int:
     forehead, chin, *_ = face_points
-    # Calcular vector de la frente a la barbilla
     face_vector = chin - forehead
-    # Calcular vector de referencia
     ref_point = np.array([0, forehead[1], 0])
     ref_vector = ref_point - forehead
 
@@ -119,10 +117,6 @@ if __name__ == "__main__":
 
     cap = cv2.VideoCapture(1)
 
-    ROLL_REFERENCE = 90
-    # print(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-    # print(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-
     while cap.isOpened():
 
         start_time = time.time()
@@ -130,7 +124,6 @@ if __name__ == "__main__":
         if not success:
             print("Ignoring empty camera frame")
             continue
-        # image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
         image.flags.writeable = False
         status, face, keypoints, keypoints_coords = get_points(image)
