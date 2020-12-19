@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import time
-from math import acos, degrees
 from typing import Tuple
 
 import pretty_errors
@@ -10,7 +9,7 @@ import mediapipe as mp
 import numpy as np
 from numpy.linalg import norm
 
-from utils import normalized_to_pixel_coordinates
+from utils import normalized_to_pixel_coordinates, angle_between_vectors
 
 POINTS = (
     10,  # Forehead
@@ -53,12 +52,6 @@ def get_points(target_img: np.ndarray) -> Tuple[bool, np.ndarray, np.ndarray, np
             _keypoints_abs_coordinates[index] = _landmark_px
 
     return _status, _points, _keypoints, _keypoints_abs_coordinates
-
-
-def angle_between_vectors(v1: np.ndarray, v2: np.ndarray) -> int:
-    cos_a = np.sum(v1 * v2) / (norm(v1) * norm(v2))
-    angle = degrees(acos(cos_a))
-    return round(angle)
 
 
 def get_roll(face_points: np.ndarray) -> int:
