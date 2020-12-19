@@ -112,7 +112,7 @@ def face_distance(target_img: np.ndarray, face_coordinates_px: np.ndarray) -> Tu
     height_delta = norm(forehead[1])
     width_delta = norm(forehead[0])
 
-    return width_delta, height_delta
+    return width_delta if not np.isnan(width_delta) else 0, height_delta if not np.isnan(height_delta) else 0
 
 
 if __name__ == "__main__":
