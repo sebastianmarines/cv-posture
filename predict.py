@@ -7,6 +7,7 @@ from typing import List, Union, NamedTuple
 import cv2
 import mediapipe as mp
 import numpy as np
+from numpy.linalg import norm
 
 _mp_face_mesh = mp.solutions.face_mesh
 
@@ -56,7 +57,7 @@ def get_points(target_img) -> Union[bool, np.ndarray[np.ndarray, np.ndarray]]:
 
     _keypoints = np.zeros((4, 3))
     for index, point in enumerate(POINTS):
-        _keypoints[index] = point
+        _keypoints[index] = _points[point]
 
     return np.array([_points, _keypoints], dtype=object)
 
@@ -70,15 +71,15 @@ def list_to_vector(_points: List[Point]) -> str:
     return _vector
 
 
-def get_roll(_points: List[Point]) -> float:
+def get_roll(_points: np.ndarray) -> float:
     forehead, chin, *_ = _points
     # Calcular vector de la frente a la barbilla
-    face_vector = Vector.from_two_points(chin, forehead)
+    face_vector = chin - forehead
     # Calcular vector de referencia
-    ref_point = Point(0, forehead.y, 0)
-    ref_vector = Vector.from_two_points(ref_point, forehead)
+    ref_point = np.array([0, forehead[1], 0])
+    ref_vector = ref_point - forehead
 
-    cos_a = (face_vector * ref_vector) / (face_vector.magnitude() * ref_vector.magnitude())
+    cos_a = np.sum(face_vector * ref_vector) / (norm(face_vector) * norm(ref_vector))
     angle = degrees(acos(cos_a))
     return angle
 
@@ -133,30 +134,30 @@ if __name__ == "__main__":
         # image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
         # results = _face_mesh.process(image)
         point_list = get_points(image)
-        # if point_list:
-        #     roll = round(get_roll(point_list))
+        if point_list is not False:
+            roll = round(get_roll(point_list[1]))
         #     yaw = round(get_yaw(point_list))
         #     pitch = round(get_pitch(point_list))
-        #     # Roll
-        #     roll_position = (lambda: "Hombro derecho" if roll < 90 else "Hombro izquierdo" if roll > 90 else "Derecho")
-        #     cv2.putText(
-        #         image,
-        #         f"Roll: {roll}",
-        #         (10, 200),
-        #         cv2.FONT_ITALIC,
-        #         0.7,
-        #         (255, 0, 0),
-        #         2
-        #     )
-        #     cv2.putText(
-        #         image,
-        #         roll_position(),
-        #         (20, 225),
-        #         cv2.FONT_ITALIC,
-        #         0.7,
-        #         (0, 0, 255),
-        #         2
-        #     )
+            # Roll
+            roll_position = (lambda: "Hombro derecho" if roll < 90 else "Hombro izquierdo" if roll > 90 else "Derecho")
+            cv2.putText(
+                image,
+                f"Roll: {roll}",
+                (10, 200),
+                cv2.FONT_ITALIC,
+                0.7,
+                (255, 0, 0),
+                2
+            )
+            cv2.putText(
+                image,
+                roll_position(),
+                (20, 225),
+                cv2.FONT_ITALIC,
+                0.7,
+                (0, 0, 255),
+                2
+            )
         #     # Yaw
         #     yaw_position = (lambda: "Izquierda" if yaw < 90 else "Derecha" if yaw > 90 else "Frente")
         #     cv2.putText(
@@ -198,7 +199,7 @@ if __name__ == "__main__":
         #         2
         #     )
 
-        if not point_list.size == 0:
+        if point_list is not False:
             image_rows, image_cols, _ = image.shape
             for face_landmarks in point_list[0]:
                 # mp_drawing.draw_landmarks(
