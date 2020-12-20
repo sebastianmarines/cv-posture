@@ -28,12 +28,12 @@ while cap.isOpened():
     image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
     mp_drawing.draw_landmarks(
         image, results.face_landmarks, mp_holistic.FACE_CONNECTIONS)
+    # mp_drawing.draw_landmarks(
+    #     image, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
+    # mp_drawing.draw_landmarks(
+    #     image, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
     mp_drawing.draw_landmarks(
-        image, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
-    mp_drawing.draw_landmarks(
-        image, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
-    mp_drawing.draw_landmarks(
-        image, results.pose_landmarks, mp_holistic.POSE_CONNECTIONS)
+        image, results.pose_landmarks)
     cv2.imshow('MediaPipe Holistic', image)
     if cv2.waitKey(5) & 0xFF == 27:
         break
