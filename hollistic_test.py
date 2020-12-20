@@ -6,7 +6,7 @@ mp_holistic = mp.solutions.holistic
 
 # For webcam input:
 holistic = mp_holistic.Holistic(
-    min_detection_confidence=0.5, min_tracking_confidence=0.5)
+    min_detection_confidence=0.5, min_tracking_confidence=0.5, upper_body_only=True)
 cap = cv2.VideoCapture(1)
 while cap.isOpened():
     success, image = cap.read()
