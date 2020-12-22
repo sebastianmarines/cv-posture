@@ -18,13 +18,13 @@ POINTS = (
 )
 
 
-def get_points(target_img: np.ndarray) -> Tuple[bool, np.ndarray, np.ndarray, np.ndarray]:
+def get_points(target_img: np.ndarray) -> Tuple[bool, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
     Processes an RGB image and returns the face landmarks on each detected face.
 
     :param target_img: An RGB image represented as a numpy array.
-    :return: A tuple containing: status, 468 landmark points, 4 keypoints, and the keypoints
-    coordinates in pixels.
+    :return: A tuple containing: status, 468 landmark points, 4 keypoints, the keypoints
+    coordinates in pixels, and pose landmarks.
     """
     _image_rows, _image_cols, _ = target_img.shape
     result = holistic.process(cv2.cvtColor(target_img, cv2.COLOR_BGR2RGB))
@@ -33,8 +33,9 @@ def get_points(target_img: np.ndarray) -> Tuple[bool, np.ndarray, np.ndarray, np
     _keypoints_abs_coordinates = np.zeros((4, 2))
     _status = False
     _points = np.zeros((0,))
+    _pose_landmarks = np.zeros((0,))
 
-    if result.face_landmarks:
+    if result.face_landmarks and result.pose_landmarks:
         _status = True
         _points = np.array([[point.x, point.y, point.z] for point in result.face_landmarks.landmark])
 
@@ -48,7 +49,9 @@ def get_points(target_img: np.ndarray) -> Tuple[bool, np.ndarray, np.ndarray, np
             )
             _keypoints_abs_coordinates[index] = _landmark_px
 
-    return _status, _points, _keypoints, _keypoints_abs_coordinates
+        _pose_landmarks = np.array([[point.x, point.y, point.z] for point in result.pose_landmarks.landmark])
+
+    return _status, _points, _keypoints, _keypoints_abs_coordinates, _pose_landmarks
 
 
 def get_roll(face_points: np.ndarray) -> int:
@@ -133,7 +136,7 @@ if __name__ == "__main__":
             continue
 
         image.flags.writeable = False
-        status, face, keypoints, keypoints_coords = get_points(image)
+        status, face, keypoints, keypoints_coords, pose_landmarks = get_points(image)
 
         if status is not False:
             roll = get_roll(keypoints)
