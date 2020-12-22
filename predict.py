@@ -10,11 +10,20 @@ from numpy.linalg import norm
 
 from utils import normalized_to_pixel_coordinates, angle_between_vectors
 
-POINTS = (
+FACE_POINTS = (
     10,  # Forehead
     152,  # Chin
     93,  # Right
     323  # Left
+)
+
+POSE_POINTS = (
+    11,  # Shoulders
+    12,
+    13,  # Elbows
+    14,
+    15,  # Wrists
+    16
 )
 
 
@@ -33,23 +42,25 @@ def get_points(target_img: np.ndarray) -> Tuple[bool, np.ndarray, np.ndarray, np
     _keypoints_abs_coordinates = np.zeros((4, 2))
     _status = False
     _points = np.zeros((0,))
-    _pose_landmarks = np.zeros((0,))
+    _pose_landmarks = np.zeros((6, 3))
 
     if result.face_landmarks and result.pose_landmarks:
         _status = True
         _points = np.array([[point.x, point.y, point.z] for point in result.face_landmarks.landmark])
 
-        for index, point in enumerate(POINTS):
-            _keypoints[index] = _points[point]
+        for _index, point in enumerate(FACE_POINTS):
+            _keypoints[_index] = _points[point]
             _landmark_px = normalized_to_pixel_coordinates(
-                _keypoints[index, 0],
-                _keypoints[index, 1],
+                _keypoints[_index, 0],
+                _keypoints[_index, 1],
                 _image_cols,
                 _image_rows
             )
-            _keypoints_abs_coordinates[index] = _landmark_px
+            _keypoints_abs_coordinates[_index] = _landmark_px
 
-        _pose_landmarks = np.array([[point.x, point.y, point.z] for point in result.pose_landmarks.landmark])
+        for _index, point in enumerate(POSE_POINTS):
+            point = result.pose_landmarks.landmark[point]
+            _pose_landmarks[_index] = np.array([point.x, point.y, point.z])
 
     return _status, _points, _keypoints, _keypoints_abs_coordinates, _pose_landmarks
 
@@ -215,38 +226,41 @@ if __name__ == "__main__":
                 2
             )
             # Deltas
-            cv2.putText(
-                image,
-                f"{y_delta}",
-                (round(keypoints_coords[0, 0]) + 10, round(y_delta / 2)),
-                cv2.FONT_ITALIC,
-                0.5,
-                (0, 0, 255),
-                2
-            )
-            cv2.line(
-                image,
-                (round(keypoints_coords[0, 0]), 0),
-                (round(keypoints_coords[0, 0]), round(keypoints_coords[0, 1])),
-                (0, 0, 255),
-                2
-            )
-            cv2.putText(
-                image,
-                f"{x_delta}",
-                (round(x_delta / 2) - 10, round(keypoints_coords[0, 1]) - 10),
-                cv2.FONT_ITALIC,
-                0.5,
-                (0, 0, 255),
-                2
-            )
-            cv2.line(
-                image,
-                (0, round(keypoints_coords[0, 1])),
-                (round(keypoints_coords[0, 0]), round(keypoints_coords[0, 1])),
-                (0, 0, 255),
-                2
-            )
+            try:
+                cv2.putText(
+                    image,
+                    f"{y_delta}",
+                    (round(keypoints_coords[0, 0]) + 10, round(y_delta / 2)),
+                    cv2.FONT_ITALIC,
+                    0.5,
+                    (0, 0, 255),
+                    2
+                )
+                cv2.line(
+                    image,
+                    (round(keypoints_coords[0, 0]), 0),
+                    (round(keypoints_coords[0, 0]), round(keypoints_coords[0, 1])),
+                    (0, 0, 255),
+                    2
+                )
+                cv2.putText(
+                    image,
+                    f"{x_delta}",
+                    (round(x_delta / 2) - 10, round(keypoints_coords[0, 1]) - 10),
+                    cv2.FONT_ITALIC,
+                    0.5,
+                    (0, 0, 255),
+                    2
+                )
+                cv2.line(
+                    image,
+                    (0, round(keypoints_coords[0, 1])),
+                    (round(keypoints_coords[0, 0]), round(keypoints_coords[0, 1])),
+                    (0, 0, 255),
+                    2
+                )
+            except ValueError:
+                pass
 
         if status is not False:
             image_rows, image_cols, _ = image.shape
@@ -260,7 +274,7 @@ if __name__ == "__main__":
                 cv2.circle(image, landmark_px, 1,
                            (255, 0, 0), 1)
 
-            for landmark in pose_landmarks:
+            for index, landmark in enumerate(pose_landmarks):
                 landmark_px = normalized_to_pixel_coordinates(
                     landmark[0],
                     landmark[1],
@@ -269,6 +283,15 @@ if __name__ == "__main__":
                 )
                 cv2.circle(image, landmark_px, 1,
                            (0, 0, 255), 5)
+                cv2.putText(
+                    image,
+                    f"{index}",
+                    landmark_px,
+                    cv2.FONT_ITALIC,
+                    0.5,
+                    (0, 0, 255),
+                    2
+                )
 
         fps = f"FPS: {round(1.0 / (time.time() - start_time))}"
         cv2.putText(
