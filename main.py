@@ -8,7 +8,10 @@ from PyQt5.QtGui import QImage, QPixmap
 
 from predict import get_points
 from ui.MainWindow import Ui_MainWindow
+from utils import normalized_to_pixel_coordinates
 from utils.images import cv2_to_qimage
+
+DEBUG = True
 
 
 class Worker(QThread):
@@ -28,6 +31,28 @@ class Worker(QThread):
                 rgb_image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 status, face_landmarks, keypoints, keypoints_coords, pose_landmarks = get_points(rgb_image,
                                                                                                  model=holistic)
+                if DEBUG and status:
+                    image_rows, image_cols, _ = rgb_image.shape
+                    for landmark in face_landmarks:
+                        landmark_px = normalized_to_pixel_coordinates(
+                            landmark[0],
+                            landmark[1],
+                            image_cols,
+                            image_rows
+                        )
+                        cv2.circle(rgb_image, landmark_px, 1,
+                                   (255, 0, 0), 1)
+
+                    for index, landmark in enumerate(pose_landmarks):
+                        landmark_px = normalized_to_pixel_coordinates(
+                            landmark[0],
+                            landmark[1],
+                            image_cols,
+                            image_rows
+                        )
+                        cv2.circle(rgb_image, landmark_px, 1,
+                                   (0, 0, 255), 5)
+
                 image = cv2_to_qimage(rgb_image)
                 self.new_frame.emit(image)
 
