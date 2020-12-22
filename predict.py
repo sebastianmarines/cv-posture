@@ -29,16 +29,14 @@ def get_points(target_img: np.ndarray) -> Tuple[bool, np.ndarray, np.ndarray, np
     _image_rows, _image_cols, _ = target_img.shape
     result = holistic.process(cv2.cvtColor(target_img, cv2.COLOR_BGR2RGB))
 
-    _points = np.zeros((468, 3))
     _keypoints = np.zeros((4, 3))
     _keypoints_abs_coordinates = np.zeros((4, 2))
     _status = False
+    _points = np.zeros((0,))
 
     if result.face_landmarks:
         _status = True
-        for index, point in enumerate(result.face_landmarks.landmark):
-            _point = np.array([point.x, point.y, point.z])
-            _points[index] = _point
+        _points = np.array([[point.x, point.y, point.z] for point in result.face_landmarks.landmark])
 
         for index, point in enumerate(POINTS):
             _keypoints[index] = _points[point]
