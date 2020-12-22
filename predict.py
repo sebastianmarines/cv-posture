@@ -37,6 +37,7 @@ def get_points(target_img: np.ndarray, model: Holistic) -> Tuple[bool, np.ndarra
     :return: A tuple containing: status, 468 landmark points, 4 keypoints, the keypoints
     coordinates in pixels, and pose landmarks.
     """
+    target_img = np.copy(target_img)
     _image_rows, _image_cols, _ = target_img.shape
     result = model.process(cv2.cvtColor(target_img, cv2.COLOR_BGR2RGB))
 
