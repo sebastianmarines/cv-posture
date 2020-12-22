@@ -27,16 +27,16 @@ def get_points(target_img: np.ndarray) -> Tuple[bool, np.ndarray, np.ndarray, np
     coordinates in pixels.
     """
     _image_rows, _image_cols, _ = target_img.shape
-    result = face_mesh.process(cv2.cvtColor(target_img, cv2.COLOR_BGR2RGB))
+    result = holistic.process(cv2.cvtColor(target_img, cv2.COLOR_BGR2RGB))
 
     _points = np.zeros((468, 3))
     _keypoints = np.zeros((4, 3))
     _keypoints_abs_coordinates = np.zeros((4, 2))
     _status = False
 
-    if result.multi_face_landmarks:
+    if result.face_landmarks:
         _status = True
-        for index, point in enumerate(result.multi_face_landmarks[0].landmark):
+        for index, point in enumerate(result.face_landmarks.landmark):
             _point = np.array([point.x, point.y, point.z])
             _points[index] = _point
 
@@ -116,12 +116,12 @@ def face_distance(target_img: np.ndarray, face_coordinates_px: np.ndarray) -> Tu
 
 if __name__ == "__main__":
     mp_drawing = mp.solutions.drawing_utils
-    mp_face_mesh = mp.solutions.face_mesh
+    mp_face_mesh = mp.solutions.holistic
     drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
-    face_mesh = mp_face_mesh.FaceMesh(
-        max_num_faces=1,
+    holistic = mp_face_mesh.Holistic(
         min_detection_confidence=0.5,
-        min_tracking_confidence=0.5
+        min_tracking_confidence=0.5,
+        upper_body_only=True
     )
 
     cap = cv2.VideoCapture(1)
@@ -274,5 +274,5 @@ if __name__ == "__main__":
         if cv2.waitKey(5) & 0xFF == 27:
             break
 
-    face_mesh.close()
+    holistic.close()
     cap.release()
