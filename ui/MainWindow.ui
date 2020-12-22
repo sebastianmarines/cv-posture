@@ -6,42 +6,40 @@
             <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>1016</width>
-                <height>768</height>
+                <width>891</width>
+                <height>674</height>
             </rect>
-        </property>
-        <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-            </sizepolicy>
         </property>
         <property name="windowTitle">
             <string>MainWindow</string>
         </property>
         <widget class="QWidget" name="centralwidget">
-            <layout class="QVBoxLayout" name="verticalLayout">
-                <item>
-                    <widget class="QLabel" name="webcam">
-                        <property name="enabled">
-                            <bool>true</bool>
-                        </property>
-                        <property name="text">
-                            <string/>
-                        </property>
-                        <property name="scaledContents">
-                            <bool>true</bool>
-                        </property>
-                    </widget>
-                </item>
-            </layout>
+            <widget class="QLabel" name="webcam">
+                <property name="enabled">
+                    <bool>true</bool>
+                </property>
+                <property name="geometry">
+                    <rect>
+                        <x>120</x>
+                        <y>20</y>
+                        <width>640</width>
+                        <height>480</height>
+                    </rect>
+                </property>
+                <property name="text">
+                    <string/>
+                </property>
+                <property name="scaledContents">
+                    <bool>true</bool>
+                </property>
+            </widget>
         </widget>
         <widget class="QMenuBar" name="menubar">
             <property name="geometry">
                 <rect>
                     <x>0</x>
                     <y>0</y>
-                    <width>1016</width>
+                    <width>891</width>
                     <height>21</height>
                 </rect>
             </property>
