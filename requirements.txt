@@ -3,3 +3,4 @@ opencv-python~=4.4.0.46
 matplotlib~=3.3.3
 numpy~=1.19.3
 pyinstaller~=4.1
+PyQt5~=5.15.2
