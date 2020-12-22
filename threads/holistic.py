@@ -10,6 +10,10 @@ from utils import normalized_to_pixel_coordinates, cv2_to_qimage
 class MPThread(QThread):
     new_frame = pyqtSignal(QtGui.QImage)
 
+    def __init__(self, debug=False, parent=None):
+        QThread.__init__(self, parent)
+        self.debug = debug
+
     def run(self) -> None:
         cap = cv2.VideoCapture(1)
         mp_face_mesh = mp.solutions.holistic
@@ -24,7 +28,7 @@ class MPThread(QThread):
                 rgb_image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 status, face_landmarks, keypoints, keypoints_coords, pose_landmarks = get_points(rgb_image,
                                                                                                  model=holistic)
-                if status:
+                if status and self.debug:
                     image_rows, image_cols, _ = rgb_image.shape
                     for landmark in face_landmarks:
                         landmark_px = normalized_to_pixel_coordinates(
