@@ -6,6 +6,7 @@ from typing import Tuple
 import cv2
 import mediapipe as mp
 import numpy as np
+from mediapipe.python.solutions.holistic import Holistic
 from numpy.linalg import norm
 
 from utils import normalized_to_pixel_coordinates, angle_between_vectors
@@ -27,16 +28,17 @@ POSE_POINTS = (
 )
 
 
-def get_points(target_img: np.ndarray) -> Tuple[bool, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+def get_points(target_img: np.ndarray, model: Holistic) -> Tuple[bool, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
     Processes an RGB image and returns the face landmarks on each detected face.
 
+    :param model: mp holistic model
     :param target_img: An RGB image represented as a numpy array.
     :return: A tuple containing: status, 468 landmark points, 4 keypoints, the keypoints
     coordinates in pixels, and pose landmarks.
     """
     _image_rows, _image_cols, _ = target_img.shape
-    result = holistic.process(cv2.cvtColor(target_img, cv2.COLOR_BGR2RGB))
+    result = model.process(cv2.cvtColor(target_img, cv2.COLOR_BGR2RGB))
 
     _keypoints = np.zeros((4, 3))
     _keypoints_abs_coordinates = np.zeros((4, 2))
@@ -147,7 +149,7 @@ if __name__ == "__main__":
             continue
 
         image.flags.writeable = False
-        status, face_landmarks, keypoints, keypoints_coords, pose_landmarks = get_points(image)
+        status, face_landmarks, keypoints, keypoints_coords, pose_landmarks = get_points(image, model=holistic)
 
         if status is not False:
             roll = get_roll(keypoints)
