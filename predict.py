@@ -6,7 +6,6 @@ from typing import Tuple
 import cv2
 import mediapipe as mp
 import numpy as np
-import pretty_errors
 from numpy.linalg import norm
 
 from utils import normalized_to_pixel_coordinates, angle_between_vectors
@@ -116,7 +115,6 @@ def face_distance(target_img: np.ndarray, face_coordinates_px: np.ndarray) -> Tu
 
 
 if __name__ == "__main__":
-    pretty_errors.replace_stderr()
     mp_drawing = mp.solutions.drawing_utils
     mp_face_mesh = mp.solutions.face_mesh
     drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
