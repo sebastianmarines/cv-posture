@@ -136,7 +136,7 @@ if __name__ == "__main__":
             continue
 
         image.flags.writeable = False
-        status, face, keypoints, keypoints_coords, pose_landmarks = get_points(image)
+        status, face_landmarks, keypoints, keypoints_coords, pose_landmarks = get_points(image)
 
         if status is not False:
             roll = get_roll(keypoints)
@@ -250,15 +250,25 @@ if __name__ == "__main__":
 
         if status is not False:
             image_rows, image_cols, _ = image.shape
-            for face_landmarks in face:
+            for landmark in face_landmarks:
                 landmark_px = normalized_to_pixel_coordinates(
-                    face_landmarks[0],
-                    face_landmarks[1],
+                    landmark[0],
+                    landmark[1],
                     image_cols,
                     image_rows
                 )
                 cv2.circle(image, landmark_px, 1,
                            (255, 0, 0), 1)
+
+            for landmark in pose_landmarks:
+                landmark_px = normalized_to_pixel_coordinates(
+                    landmark[0],
+                    landmark[1],
+                    image_cols,
+                    image_rows
+                )
+                cv2.circle(image, landmark_px, 1,
+                           (0, 0, 255), 5)
 
         fps = f"FPS: {round(1.0 / (time.time() - start_time))}"
         cv2.putText(
