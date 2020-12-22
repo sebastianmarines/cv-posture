@@ -4,10 +4,9 @@ from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import QThread
 from PyQt5.QtGui import QImage, QPixmap
 
+import settings
 from threads import MPThread
 from ui.MainWindow import Ui_MainWindow
-
-DEBUG = True
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -23,7 +22,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.thread = QThread()
         # Step 3: Create a worker object
-        self.worker = MPThread(debug=DEBUG)
+        self.worker = MPThread(debug=settings.DEBUG)
         # Step 4: Move worker to the thread
         self.worker.moveToThread(self.thread)
         # Step 5: Connect signals and slots
