@@ -1,11 +1,14 @@
 import sys
 
 import cv2
+import mediapipe as mp
 from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import QThread, pyqtSignal, Qt
+from PyQt5.QtCore import QThread, pyqtSignal
 from PyQt5.QtGui import QImage, QPixmap
 
+from predict import get_points
 from ui.MainWindow import Ui_MainWindow
+from utils.images import cv2_to_qimage
 
 
 class Worker(QThread):
@@ -13,15 +16,20 @@ class Worker(QThread):
 
     def run(self) -> None:
         cap = cv2.VideoCapture(1)
+        mp_face_mesh = mp.solutions.holistic
+        holistic = mp_face_mesh.Holistic(
+            min_detection_confidence=0.5,
+            min_tracking_confidence=0.5,
+            upper_body_only=True
+        )
         while True:
             success, frame = cap.read()
             if success:
                 rgb_image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                h, w, ch = rgb_image.shape
-                bytes_per_line = ch * w
-                convert_to_qt_format = QImage(rgb_image.data, w, h, bytes_per_line, QImage.Format_RGB888)
-                p = convert_to_qt_format.scaled(640, 480, Qt.KeepAspectRatio)
-                self.new_frame.emit(p)
+                status, face_landmarks, keypoints, keypoints_coords, pose_landmarks = get_points(rgb_image,
+                                                                                                 model=holistic)
+                image = cv2_to_qimage(rgb_image)
+                self.new_frame.emit(image)
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -41,6 +49,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # Step 4: Move worker to the thread
         self.worker.moveToThread(self.thread)
         # Step 5: Connect signals and slots
+        # noinspection PyUnresolvedReferences
         self.thread.started.connect(self.worker.run)
         self.worker.new_frame.connect(self.show_image)
         # Step 6: Start the thread
