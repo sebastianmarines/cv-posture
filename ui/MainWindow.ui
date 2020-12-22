@@ -6,47 +6,42 @@
             <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>996</width>
-                <height>743</height>
+                <width>1016</width>
+                <height>768</height>
             </rect>
+        </property>
+        <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+            </sizepolicy>
         </property>
         <property name="windowTitle">
             <string>MainWindow</string>
         </property>
         <widget class="QWidget" name="centralwidget">
-            <widget class="QLabel" name="label">
-                <property name="geometry">
-                    <rect>
-                        <x>310</x>
-                        <y>180</y>
-                        <width>271</width>
-                        <height>271</height>
-                    </rect>
-                </property>
-                <property name="text">
-                    <string/>
-                </property>
-            </widget>
-            <widget class="QPushButton" name="pushButton">
-                <property name="geometry">
-                    <rect>
-                        <x>410</x>
-                        <y>580</y>
-                        <width>101</width>
-                        <height>41</height>
-                    </rect>
-                </property>
-                <property name="text">
-                    <string>Show camera</string>
-                </property>
-            </widget>
+            <layout class="QVBoxLayout" name="verticalLayout">
+                <item>
+                    <widget class="QLabel" name="webcam">
+                        <property name="enabled">
+                            <bool>true</bool>
+                        </property>
+                        <property name="text">
+                            <string/>
+                        </property>
+                        <property name="scaledContents">
+                            <bool>true</bool>
+                        </property>
+                    </widget>
+                </item>
+            </layout>
         </widget>
         <widget class="QMenuBar" name="menubar">
             <property name="geometry">
                 <rect>
                     <x>0</x>
                     <y>0</y>
-                    <width>996</width>
+                    <width>1016</width>
                     <height>21</height>
                 </rect>
             </property>

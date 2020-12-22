@@ -2,8 +2,26 @@ import sys
 
 import cv2
 from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt5.QtCore import QThread, pyqtSignal, Qt
+from PyQt5.QtGui import QImage, QPixmap
 
-from ui.mainwindow import Ui_MainWindow
+from ui.MainWindow import Ui_MainWindow
+
+
+class Worker(QThread):
+    new_frame = pyqtSignal(QtGui.QImage)
+
+    def run(self) -> None:
+        cap = cv2.VideoCapture(1)
+        while True:
+            success, frame = cap.read()
+            if success:
+                rgb_image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                h, w, ch = rgb_image.shape
+                bytes_per_line = ch * w
+                convert_to_qt_format = QImage(rgb_image.data, w, h, bytes_per_line, QImage.Format_RGB888)
+                p = convert_to_qt_format.scaled(640, 480, Qt.KeepAspectRatio)
+                self.new_frame.emit(p)
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -15,20 +33,22 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.ui.setupUi(self)
 
-        # self.ui.video.s
-        # self.ui.label.setPicture()
+        self.setFixedSize(self.size())
 
-        self.cap = cv2.VideoCapture(1)
+        self.thread = QThread()
+        # Step 3: Create a worker object
+        self.worker = Worker()
+        # Step 4: Move worker to the thread
+        self.worker.moveToThread(self.thread)
+        # Step 5: Connect signals and slots
+        self.thread.started.connect(self.worker.run)
+        self.worker.new_frame.connect(self.show_image)
+        # Step 6: Start the thread
+        self.thread.start()
 
-        self.ui.pushButton.clicked.connect(self.show_image)
-
-    @QtCore.pyqtSlot()
-    def show_image(self):
-        success, image = self.cap.read()
-        self.image = image
-        self.image = QtGui.QImage(self.image.data, self.image.shape[1], self.image.shape[0],
-                                  QtGui.QImage.Format_RGB888).rgbSwapped()
-        self.ui.label.setPixmap(QtGui.QPixmap.fromImage(self.image))
+    @QtCore.pyqtSlot(QImage)
+    def show_image(self, image):
+        self.ui.webcam.setPixmap(QPixmap.fromImage(image))
 
 
 app = QtWidgets.QApplication([])
