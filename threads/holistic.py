@@ -9,6 +9,7 @@ from utils import normalized_to_pixel_coordinates, cv2_to_qimage
 
 class MPThread(QThread):
     new_frame = pyqtSignal(QtGui.QImage)
+    data = pyqtSignal(tuple)
 
     def __init__(self, debug=False, parent=None):
         QThread.__init__(self, parent)
@@ -50,5 +51,7 @@ class MPThread(QThread):
                         cv2.circle(rgb_image, landmark_px, 1,
                                    (0, 0, 255), 5)
 
-                image = cv2_to_qimage(rgb_image)
-                self.new_frame.emit(image)
+                    image = cv2_to_qimage(rgb_image)
+                    self.new_frame.emit(image)
+
+                    self.data.emit((keypoints, pose_landmarks))
