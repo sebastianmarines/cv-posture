@@ -13,15 +13,13 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def __init__(self):
         super().__init__()
-
         self.ui = Ui_MainWindow()
-
         self.ui.setupUi(self)
-
         self.setFixedSize(self.size())
-
         self.data: tuple = ()
+        self.start_mediapipe()
 
+    def start_mediapipe(self):
         self.thread = QThread()
         # Step 3: Create a mpworker object
         self.mpworker = MPThread(debug=settings.DEBUG)
