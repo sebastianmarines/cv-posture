@@ -51,7 +51,7 @@ class MPThread(QThread):
                         cv2.circle(rgb_image, landmark_px, 1,
                                    (0, 0, 255), 5)
 
-                    image = cv2_to_qimage(rgb_image)
-                    self.new_frame.emit(image)
+                image = cv2_to_qimage(rgb_image)
+                self.new_frame.emit(image)
 
-                    self.data.emit((keypoints, pose_landmarks))
+                self.data.emit((keypoints, pose_landmarks))

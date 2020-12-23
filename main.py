@@ -20,6 +20,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.setFixedSize(self.size())
 
+        self.data: tuple = ()
+
         self.thread = QThread()
         # Step 3: Create a mpworker object
         self.mpworker = MPThread(debug=settings.DEBUG)
@@ -39,7 +41,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     @QtCore.pyqtSlot(tuple)
     def store_data(self, data):
-        print(data)
+        self.data = data
 
 
 app = QtWidgets.QApplication([])
