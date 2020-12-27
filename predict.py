@@ -139,7 +139,7 @@ if __name__ == "__main__":
         upper_body_only=True
     )
 
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(0)
 
     while cap.isOpened():
 
