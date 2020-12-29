@@ -1,22 +1,19 @@
 import cv2
 import mediapipe as mp
 from PyQt5 import QtGui
-from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt5.QtCore import pyqtSignal, QObject
 
 from predict import get_points
 from utils import normalized_to_pixel_coordinates, cv2_to_qimage
 
 
-class MPThread(QThread):
+class MPThread(QObject):
     new_frame = pyqtSignal(QtGui.QImage)
     data = pyqtSignal(tuple)
-
-    def __init__(self, debug=False, parent=None):
-        QThread.__init__(self, parent)
-        self.debug = debug
+    debug = True
 
     def run(self) -> None:
-        cap = cv2.VideoCapture(1)
+        cap = cv2.VideoCapture(0)
         mp_face_mesh = mp.solutions.holistic
         holistic = mp_face_mesh.Holistic(
             min_detection_confidence=0.5,
