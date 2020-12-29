@@ -1,17 +1,20 @@
+import time
+
 import gspread
-from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt5.QtCore import QObject, pyqtSignal
 from oauth2client.service_account import ServiceAccountCredentials
 
 
-class DataSave(QThread):
+class DataSave(QObject):
     finished = pyqtSignal()
+    message = pyqtSignal(str)
 
-    def __init__(self, data, parent=None):
-        QThread.__init__(self, parent)
+    def __init__(self, data):
+        QObject.__init__(self)
         self.data = data
 
         scope = ['https://spreadsheets.google.com/feeds']
-        creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
+        creds = ServiceAccountCredentials.from_json_keyfile_name('credentials.json', scope)
         client = gspread.authorize(creds)
         sheet = client.open_by_key('1tHJcEPP03dWHxb7JTOw2xt9tE7mTRWeSdF2ywv3lRCo')
         self.worksheet = sheet.sheet1
@@ -22,4 +25,6 @@ class DataSave(QThread):
         # worksheet.update(f"A{index]", [array.flatten().tolist()])
 
     def run(self) -> None:
-        pass
+        time.sleep(3)
+        self.message.emit("Finishing")
+        self.finished.emit()
