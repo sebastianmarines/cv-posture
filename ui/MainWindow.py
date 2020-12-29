@@ -23,6 +23,9 @@ class Ui_MainWindow(object):
         self.webcam.setText("")
         self.webcam.setScaledContents(True)
         self.webcam.setObjectName("webcam")
+        self.send_data = QtWidgets.QPushButton(self.centralwidget)
+        self.send_data.setGeometry(QtCore.QRect(380, 570, 75, 23))
+        self.send_data.setObjectName("send_data")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 891, 21))
@@ -38,3 +41,4 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        self.send_data.setText(_translate("MainWindow", "Send data"))
