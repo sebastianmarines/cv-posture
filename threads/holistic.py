@@ -18,7 +18,7 @@ class MPThread(QObject):
         self.running = True
 
     def run(self) -> None:
-        cap = cv2.VideoCapture(0)
+        cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
         mp_face_mesh = mp.solutions.holistic
         holistic = mp_face_mesh.Holistic(
             min_detection_confidence=0.5,
@@ -57,4 +57,7 @@ class MPThread(QObject):
                 self.new_frame.emit(image)
 
                 self.data.emit((keypoints, pose_landmarks))
+
+        cap.release()
+        cv2.destroyAllWindows()
         self.finished.emit()
