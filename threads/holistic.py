@@ -10,7 +10,12 @@ from utils import normalized_to_pixel_coordinates, cv2_to_qimage
 class MPThread(QObject):
     new_frame = pyqtSignal(QtGui.QImage)
     data = pyqtSignal(tuple)
+    finished = pyqtSignal()
     debug = True
+
+    def __init__(self):
+        super(MPThread, self).__init__()
+        self.running = True
 
     def run(self) -> None:
         cap = cv2.VideoCapture(0)
@@ -20,7 +25,7 @@ class MPThread(QObject):
             min_tracking_confidence=0.5,
             upper_body_only=True
         )
-        while True:
+        while self.running:
             success, frame = cap.read()
             if success:
                 rgb_image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -52,3 +57,4 @@ class MPThread(QObject):
                 self.new_frame.emit(image)
 
                 self.data.emit((keypoints, pose_landmarks))
+        self.finished.emit()
