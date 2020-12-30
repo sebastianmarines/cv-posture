@@ -1,5 +1,3 @@
-import time
-
 import gspread
 from PyQt5.QtCore import QObject, pyqtSignal
 from oauth2client.service_account import ServiceAccountCredentials
@@ -25,6 +23,7 @@ class DataSave(QObject):
         # worksheet.update(f"A{index]", [array.flatten().tolist()])
 
     def run(self) -> None:
-        time.sleep(3)
+        flat_list = [item.item() for array in self.data for item in array.flatten()]
+        self.worksheet.append_row(flat_list)
         self.message.emit("Finishing")
         self.finished.emit()
