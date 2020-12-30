@@ -6,6 +6,7 @@ from typing import Tuple
 import cv2
 import mediapipe as mp
 import numpy as np
+from mediapipe.python.solutions.holistic import Holistic
 from numpy.linalg import norm
 
 from utils import normalized_to_pixel_coordinates, angle_between_vectors
@@ -27,16 +28,18 @@ POSE_POINTS = (
 )
 
 
-def get_points(target_img: np.ndarray) -> Tuple[bool, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+def get_points(target_img: np.ndarray, model: Holistic) -> Tuple[bool, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
     Processes an RGB image and returns the face landmarks on each detected face.
 
+    :param model: mp holistic model
     :param target_img: An RGB image represented as a numpy array.
     :return: A tuple containing: status, 468 landmark points, 4 keypoints, the keypoints
     coordinates in pixels, and pose landmarks.
     """
+    target_img = np.copy(target_img)
     _image_rows, _image_cols, _ = target_img.shape
-    result = holistic.process(cv2.cvtColor(target_img, cv2.COLOR_BGR2RGB))
+    result = model.process(cv2.cvtColor(target_img, cv2.COLOR_BGR2RGB))
 
     _keypoints = np.zeros((4, 3))
     _keypoints_abs_coordinates = np.zeros((4, 2))
@@ -136,7 +139,7 @@ if __name__ == "__main__":
         upper_body_only=True
     )
 
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(0)
 
     while cap.isOpened():
 
@@ -147,7 +150,7 @@ if __name__ == "__main__":
             continue
 
         image.flags.writeable = False
-        status, face_landmarks, keypoints, keypoints_coords, pose_landmarks = get_points(image)
+        status, face_landmarks, keypoints, keypoints_coords, pose_landmarks = get_points(image, model=holistic)
 
         if status is not False:
             roll = get_roll(keypoints)
@@ -226,38 +229,41 @@ if __name__ == "__main__":
                 2
             )
             # Deltas
-            cv2.putText(
-                image,
-                f"{y_delta}",
-                (round(keypoints_coords[0, 0]) + 10, round(y_delta / 2)),
-                cv2.FONT_ITALIC,
-                0.5,
-                (0, 0, 255),
-                2
-            )
-            cv2.line(
-                image,
-                (round(keypoints_coords[0, 0]), 0),
-                (round(keypoints_coords[0, 0]), round(keypoints_coords[0, 1])),
-                (0, 0, 255),
-                2
-            )
-            cv2.putText(
-                image,
-                f"{x_delta}",
-                (round(x_delta / 2) - 10, round(keypoints_coords[0, 1]) - 10),
-                cv2.FONT_ITALIC,
-                0.5,
-                (0, 0, 255),
-                2
-            )
-            cv2.line(
-                image,
-                (0, round(keypoints_coords[0, 1])),
-                (round(keypoints_coords[0, 0]), round(keypoints_coords[0, 1])),
-                (0, 0, 255),
-                2
-            )
+            try:
+                cv2.putText(
+                    image,
+                    f"{y_delta}",
+                    (round(keypoints_coords[0, 0]) + 10, round(y_delta / 2)),
+                    cv2.FONT_ITALIC,
+                    0.5,
+                    (0, 0, 255),
+                    2
+                )
+                cv2.line(
+                    image,
+                    (round(keypoints_coords[0, 0]), 0),
+                    (round(keypoints_coords[0, 0]), round(keypoints_coords[0, 1])),
+                    (0, 0, 255),
+                    2
+                )
+                cv2.putText(
+                    image,
+                    f"{x_delta}",
+                    (round(x_delta / 2) - 10, round(keypoints_coords[0, 1]) - 10),
+                    cv2.FONT_ITALIC,
+                    0.5,
+                    (0, 0, 255),
+                    2
+                )
+                cv2.line(
+                    image,
+                    (0, round(keypoints_coords[0, 1])),
+                    (round(keypoints_coords[0, 0]), round(keypoints_coords[0, 1])),
+                    (0, 0, 255),
+                    2
+                )
+            except ValueError:
+                pass
 
         if status is not False:
             image_rows, image_cols, _ = image.shape
