@@ -9,6 +9,11 @@ from ui.MainWindow import Ui_MainWindow
 
 
 class MainWindow(QtWidgets.QMainWindow):
+    poses = (
+        './posture-images/encorvado.jpg',
+        './posture-images/encorvado-codo.jpg',
+        './posture-images/sumido.png'
+    )
 
     def __init__(self):
         super().__init__()
