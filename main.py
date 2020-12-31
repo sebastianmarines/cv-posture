@@ -4,7 +4,7 @@ from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import QThread
 from PyQt5.QtGui import QImage, QPixmap
 
-from threads import MPThread, DataSave
+from threads import MPThread, DataSave, Counter
 from ui.MainWindow import Ui_MainWindow
 
 
@@ -20,6 +20,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.thread_finished = False
         self.start_mediapipe()
         self.ui.send_data.clicked.connect(self.send_data)
+        self.counter()
 
     def start_mediapipe(self) -> None:
         self.mp_thread = QThread(parent=self)
@@ -44,6 +45,18 @@ class MainWindow(QtWidgets.QMainWindow):
         self.data_worker.message.connect(self.print_msg)
         self.data_worker.finished.connect(self.toggle_button)
         self.data_thread.start()
+
+    def counter(self, time: int = 5):
+        self.counter_thread = QThread(parent=self)
+        self.counter_worker = Counter(time=time)
+        self.counter_worker.moveToThread(self.counter_thread)
+        self.counter_thread.started.connect(self.counter_worker.run)
+        self.counter_worker.second.connect(self.update_counter)
+        self.counter_thread.start()
+
+    @QtCore.pyqtSlot(int)
+    def update_counter(self, time):
+        self.ui.contador.setText(str(time))
 
     @QtCore.pyqtSlot()
     def toggle_button(self):
