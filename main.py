@@ -10,22 +10,28 @@ from ui.MainWindow import Ui_MainWindow
 
 class MainWindow(QtWidgets.QMainWindow):
     poses = (
-        './posture-images/encorvado.jpg',
-        './posture-images/encorvado-codo.jpg',
-        './posture-images/sumido.png'
+        ('./posture-images/encorvado.jpg', 'Encorvado'),
+        ('./posture-images/encorvado-codo.jpg', 'Recargado en codo'),
+        ('./posture-images/sumido.png', 'Sumido')
     )
 
     def __init__(self):
         super().__init__()
-        self.ui = Ui_MainWindow()
-        self.ui.setupUi(self)
-        self.setFixedSize(self.size())
+
         self.data: tuple = ()
         self.button_state = True
         self.thread_finished = False
-        self.start_mediapipe()
+        self.poses_index = 0
+
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self)
+        self.setFixedSize(self.size())
+
         self.ui.send_data.clicked.connect(self.send_data)
-        self.counter()
+        self.start_mediapipe()
+        self.counter(time=10)
+
+    # Threads
 
     def start_mediapipe(self) -> None:
         self.mp_thread = QThread(parent=self)
@@ -44,8 +50,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def send_data(self) -> None:
         self.data_thread = QThread(parent=self)
-        self.data_worker = DataSave(self.data)
+        self.data_worker = DataSave(self.data, extras=[])
         self.data_worker.moveToThread(self.data_thread)
+        # noinspection PyUnresolvedReferences
         self.data_thread.started.connect(self.data_worker.run)
         self.data_worker.message.connect(self.print_msg)
         self.data_worker.finished.connect(self.toggle_button)
@@ -55,9 +62,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.counter_thread = QThread(parent=self)
         self.counter_worker = Counter(time=time)
         self.counter_worker.moveToThread(self.counter_thread)
+        # noinspection PyUnresolvedReferences
         self.counter_thread.started.connect(self.counter_worker.run)
         self.counter_worker.second.connect(self.update_counter)
+        self.counter_worker.finished.connect(self.send_data)
         self.counter_thread.start()
+
+    # Signal slots
 
     @QtCore.pyqtSlot(int)
     def update_counter(self, time):
