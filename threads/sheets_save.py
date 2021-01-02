@@ -4,6 +4,8 @@ import gspread
 from PyQt5.QtCore import QObject, pyqtSignal
 from oauth2client.service_account import ServiceAccountCredentials
 
+from utils import resource_path
+
 
 class DataSave(QObject):
     finished = pyqtSignal()
@@ -16,7 +18,10 @@ class DataSave(QObject):
 
     def run(self) -> None:
         scope = ['https://spreadsheets.google.com/feeds']
-        credentials = ServiceAccountCredentials.from_json_keyfile_name('credentials.json', scope)
+        credentials = ServiceAccountCredentials.from_json_keyfile_name(
+            resource_path('credentials.json'),
+            scope
+        )
         client = gspread.authorize(credentials)
         sheet = client.open_by_key('1tHJcEPP03dWHxb7JTOw2xt9tE7mTRWeSdF2ywv3lRCo')
         worksheet = sheet.sheet1

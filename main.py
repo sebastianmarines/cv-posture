@@ -1,11 +1,12 @@
 import sys
 
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import QThread
 from PyQt5.QtGui import QImage, QPixmap
 
 from threads import MPThread, DataSave, Counter
 from ui.MainWindow import Ui_MainWindow
+from utils import resource_path
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -27,9 +28,15 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.setupUi(self)
         self.setFixedSize(self.size())
 
+        self.ui.current_image.setPixmap(
+            QtGui.QPixmap(
+                resource_path("posture-images/encorvado.jpg")
+            )
+        )
+
         self.ui.send_data.clicked.connect(self.send_data)
         self.start_mediapipe()
-        self.counter(time=10)
+        self.counter()
 
     # Threads
 
