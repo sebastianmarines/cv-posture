@@ -13,14 +13,7 @@ class SlotsMixin:
 
     @pyqtSlot(int)
     def update_counter(self, time):
-        self.ui.contador.setText(str(time))
-
-    @pyqtSlot()
-    def toggle_button(self):
-        self.data_thread.quit()
-        self.data_thread.wait()
-        self.ui.send_data.setEnabled(self.button_state)
-        self.button_state = not self.button_state
+        self.ui.counter.setText(str(time))
 
     @pyqtSlot(str)
     def print_msg(self, message: str) -> None:

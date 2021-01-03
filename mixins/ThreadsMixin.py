@@ -36,7 +36,6 @@ class ThreadsMixin:
         # noinspection PyUnresolvedReferences
         self.data_thread.started.connect(self.data_worker.run)
         self.data_worker.message.connect(self.print_msg)
-        self.data_worker.finished.connect(self.toggle_button)
         self.data_thread.start()
 
     def counter(self, time: int = 5):
