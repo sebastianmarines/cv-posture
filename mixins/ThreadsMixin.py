@@ -15,6 +15,7 @@ class ThreadsMixin:
     data_worker: QObject
     counter_worker: QObject
     ui: Ui_MainWindow
+    current_pose: str
 
     def start_mediapipe(self) -> None:
         self.mp_thread = QThread(parent=self)
@@ -34,7 +35,9 @@ class ThreadsMixin:
     def send_data(self) -> None:
         self.ui.counter.setText("Cargando...")
         self.data_thread = QThread(parent=self)
-        self.data_worker = DataSave(self.data, extras=[])
+        self.data_worker = DataSave(self.data, extras=[
+            self.current_pose
+        ])
         self.data_worker.moveToThread(self.data_thread)
         # noinspection PyUnresolvedReferences
         self.data_thread.started.connect(self.data_worker.run)

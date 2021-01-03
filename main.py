@@ -23,6 +23,7 @@ class MainWindow(QtWidgets.QMainWindow, SlotsMixin, ThreadsMixin):
         self.poses_index = 0
         self.started = False
         self.active = False
+        self.current_pose = ""
 
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
@@ -53,6 +54,7 @@ class MainWindow(QtWidgets.QMainWindow, SlotsMixin, ThreadsMixin):
         self.ui.current_image.setPixmap(
             QtGui.QPixmap(resource_path(_curr_image))
         )
+        self.current_pose = _img_description
         self.poses_index += 1
         self.counter()
 
