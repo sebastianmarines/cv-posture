@@ -3,6 +3,7 @@ from typing import Any
 from PyQt5.QtCore import QThread, QObject
 
 from threads import MPThread, DataSave, Counter
+from ui.MainWindow import Ui_MainWindow
 
 
 class ThreadsMixin:
@@ -13,6 +14,7 @@ class ThreadsMixin:
     mpworker: QObject
     data_worker: QObject
     counter_worker: QObject
+    ui: Ui_MainWindow
 
     def start_mediapipe(self) -> None:
         self.mp_thread = QThread(parent=self)
@@ -30,6 +32,7 @@ class ThreadsMixin:
         self.mp_thread.start()
 
     def send_data(self) -> None:
+        self.ui.counter.setText("Cargando...")
         self.data_thread = QThread(parent=self)
         self.data_worker = DataSave(self.data, extras=[])
         self.data_worker.moveToThread(self.data_thread)
