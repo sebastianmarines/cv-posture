@@ -22,21 +22,27 @@ class MainWindow(QtWidgets.QMainWindow):
         self.data: tuple = ()
         self.button_state = True
         self.thread_finished = False
-        self.poses_index = 0
+        self.poses_index = 1
 
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.setFixedSize(self.size())
 
-        self.ui.current_image.setPixmap(
-            QtGui.QPixmap(
-                resource_path("posture-images/encorvado.jpg")
-            )
-        )
+        self.handle_pose_images()
 
         self.ui.send_data.clicked.connect(self.send_data)
         self.start_mediapipe()
-        self.counter()
+        self.counter(time=50)
+
+    def handle_pose_images(self):
+        if self.poses_index > len(self.poses):
+            # TODO Handle exit
+            return
+        _curr_image, _img_description = self.poses[self.poses_index]
+        self.ui.current_image.setPixmap(
+            QtGui.QPixmap(resource_path(_curr_image))
+        )
+        self.poses_index += 1
 
     # Threads
 
