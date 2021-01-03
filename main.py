@@ -19,8 +19,9 @@ class MainWindow(QtWidgets.QMainWindow, SlotsMixin, ThreadsMixin):
         self.data: tuple = ()
         self.button_state = True
         self.thread_finished = False
-        self.poses_index = 1
+        self.poses_index = 0
         self.started = False
+        self.active = False
 
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
@@ -34,19 +35,24 @@ class MainWindow(QtWidgets.QMainWindow, SlotsMixin, ThreadsMixin):
         self.ui.start.clicked.connect(self.start)
 
     def start(self):
+        self.active = True
         self.ui.start.setEnabled(False)
         self.handle_pose_images()
-        self.counter()
 
     def handle_pose_images(self):
-        if self.poses_index > len(self.poses):
-            # TODO Handle exit
+        if self.poses_index > len(self.poses) - 1:
+            self.active = False
             return
         _curr_image, _img_description = self.poses[self.poses_index]
         self.ui.current_image.setPixmap(
             QtGui.QPixmap(resource_path(_curr_image))
         )
         self.poses_index += 1
+        self.counter()
+
+    def next(self):
+        if self.active:
+            self.handle_pose_images()
 
 
 app = QtWidgets.QApplication([])

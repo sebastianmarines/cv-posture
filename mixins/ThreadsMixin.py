@@ -35,7 +35,7 @@ class ThreadsMixin:
         self.data_worker.moveToThread(self.data_thread)
         # noinspection PyUnresolvedReferences
         self.data_thread.started.connect(self.data_worker.run)
-        self.data_worker.message.connect(self.print_msg)
+        self.data_worker.finished.connect(self.next)
         self.data_thread.start()
 
     def counter(self, time: int = 5):
@@ -64,4 +64,7 @@ class ThreadsMixin:
         pass
 
     def store_data(self):
+        pass
+
+    def next(self):
         pass

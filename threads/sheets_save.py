@@ -8,7 +8,7 @@ from utils import resource_path
 
 
 class DataSave(QObject):
-    message = pyqtSignal(str)
+    finished = pyqtSignal()
 
     def __init__(self, data, extras: List):
         QObject.__init__(self)
@@ -27,4 +27,4 @@ class DataSave(QObject):
         flat_list = self.extras
         flat_list += [item.item() for array in self.data for item in array.flatten()]
         worksheet.append_row(flat_list)
-        self.message.emit("Finishing")
+        self.finished.emit()
