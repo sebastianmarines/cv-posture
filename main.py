@@ -3,6 +3,7 @@ import sys
 from PyQt5 import QtWidgets, QtGui
 
 from mixins import ThreadsMixin, SlotsMixin
+from ui.Alert import Ui_Dialog
 from ui.MainWindow import Ui_MainWindow
 from utils import resource_path
 
@@ -27,6 +28,10 @@ class MainWindow(QtWidgets.QMainWindow, SlotsMixin, ThreadsMixin):
         self.ui.setupUi(self)
         self.setFixedSize(self.size())
 
+        self.dialog = QtWidgets.QDialog()
+        self.alert = Ui_Dialog()
+        self.alert.setupUi(Dialog=self.dialog)
+
         self.setup()
 
     def setup(self):
@@ -42,6 +47,7 @@ class MainWindow(QtWidgets.QMainWindow, SlotsMixin, ThreadsMixin):
     def handle_pose_images(self):
         if self.poses_index > len(self.poses) - 1:
             self.active = False
+            self.next()
             return
         _curr_image, _img_description = self.poses[self.poses_index]
         self.ui.current_image.setPixmap(
@@ -53,6 +59,9 @@ class MainWindow(QtWidgets.QMainWindow, SlotsMixin, ThreadsMixin):
     def next(self):
         if self.active:
             self.handle_pose_images()
+        else:
+            self.ui.counter.setText("--")
+            self.dialog.show()
 
 
 app = QtWidgets.QApplication([])
