@@ -24,6 +24,7 @@ class DataSave(QObject):
         client = gspread.authorize(credentials)
         sheet = client.open_by_key('1tHJcEPP03dWHxb7JTOw2xt9tE7mTRWeSdF2ywv3lRCo')
         worksheet = sheet.sheet1
-        flat_list = [item.item() for array in self.data for item in array.flatten()]
+        flat_list = self.extras
+        flat_list += [item.item() for array in self.data for item in array.flatten()]
         worksheet.append_row(flat_list)
         self.message.emit("Finishing")
