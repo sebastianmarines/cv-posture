@@ -20,15 +20,22 @@ class MainWindow(QtWidgets.QMainWindow, SlotsMixin, ThreadsMixin):
         self.button_state = True
         self.thread_finished = False
         self.poses_index = 1
+        self.started = False
 
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.setFixedSize(self.size())
 
-        self.handle_pose_images()
+        self.setup()
 
-        self.ui.send_data.clicked.connect(self.send_data)
+    def setup(self):
         self.start_mediapipe()
+        self.ui.counter.setText("--")
+        self.ui.start.clicked.connect(self.start)
+
+    def start(self):
+        self.ui.start.setEnabled(False)
+        self.handle_pose_images()
         self.counter()
 
     def handle_pose_images(self):
