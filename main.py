@@ -10,6 +10,7 @@ from utils import resource_path
 
 class MainWindow(QtWidgets.QMainWindow, SlotsMixin, ThreadsMixin):
     poses = (
+        ('./posture-images/derecho.jpg', 'Derecho'),
         ('./posture-images/encorvado.jpg', 'Encorvado'),
         ('./posture-images/encorvado-codo.jpg', 'Recargado en codo'),
         ('./posture-images/sumido.png', 'Sumido')
