@@ -7,6 +7,7 @@ ifdef onefile
 	--add-data=.\venv\Lib\site-packages\mediapipe\;mediapipe \
 	--add-data=.\posture-images\;.\posture-images\ \
 	--add-data=.\credentials.json;. \
+	--add-data=.\logo.png;. \
 	--icon icon.ico \
 	$(file)
 else
@@ -14,6 +15,7 @@ else
 	--add-data=.\venv\Lib\site-packages\mediapipe\;mediapipe \
 	--add-data=.\posture-images\;.\posture-images\ \
 	--add-data=.\credentials.json;. \
+	--add-data=.\logo.png;. \
 	--icon icon.ico \
 	$(file)
 endif

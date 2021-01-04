@@ -29,6 +29,12 @@ class MainWindow(QtWidgets.QMainWindow, SlotsMixin, ThreadsMixin):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.setFixedSize(self.size())
+        self.setWindowIcon(
+            QtGui.QIcon(
+                resource_path("logo.png")
+            )
+        )
+        self.setWindowTitle("Stance")
 
         self.dialog = QtWidgets.QDialog()
         self.alert = Ui_Dialog()
