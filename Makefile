@@ -6,10 +6,14 @@ ifdef onefile
 	pyinstaller --noconfirm --log-level=WARN --onefile --windowed \
 	--add-data=.\venv\Lib\site-packages\mediapipe\;mediapipe \
 	--add-data=.\posture-images\;.\posture-images\ \
-	--add-data=.\credentials.json;. $(file)
+	--add-data=.\credentials.json;. \
+	--icon icon.ico \
+	$(file)
 else
 	pyinstaller --noconfirm --log-level=WARN \
 	--add-data=.\venv\Lib\site-packages\mediapipe\;mediapipe \
 	--add-data=.\posture-images\;.\posture-images\ \
-	--add-data=.\credentials.json;. $(file)
+	--add-data=.\credentials.json;. \
+	--icon icon.ico \
+	$(file)
 endif
