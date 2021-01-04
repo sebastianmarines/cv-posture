@@ -1,5 +1,5 @@
 <h1 align="center">
-    <img src="logo.png" alt="Logo"/>
+    <img src="logo.svg" alt="Logo" height="150px"/>
     <br>
     <span>Stance</span>
 </h1>
