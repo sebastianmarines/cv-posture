@@ -44,6 +44,7 @@ class MainWindow(QtWidgets.QMainWindow, SlotsMixin, ThreadsMixin):
     def start(self):
         self.active = True
         self.ui.start.setEnabled(False)
+        self.ui.instructions.setText("Por favor sientate como se muestra en la imagen")
         self.handle_pose_images()
 
     def handle_pose_images(self):
@@ -56,6 +57,7 @@ class MainWindow(QtWidgets.QMainWindow, SlotsMixin, ThreadsMixin):
             QtGui.QPixmap(resource_path(_curr_image))
         )
         self.current_pose = _img_description
+        self.ui.pose.setText(self.current_pose)
         self.poses_index += 1
         self.counter()
 

@@ -16,6 +16,55 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
     <item row="3" column="1">
+     <widget class="QLabel" name="counter">
+      <property name="font">
+       <font>
+        <pointsize>11</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>5</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QLabel" name="instructions">
+      <property name="maximumSize">
+       <size>
+        <width>350</width>
+        <height>50</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="layoutDirection">
+       <enum>Qt::LeftToRight</enum>
+      </property>
+      <property name="text">
+       <string>Presiona el boton de iniciar para comenzar</string>
+      </property>
+      <property name="scaledContents">
+       <bool>true</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="margin">
+       <number>0</number>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1">
      <widget class="QLabel" name="current_image">
       <property name="maximumSize">
        <size>
@@ -32,6 +81,13 @@
      </widget>
     </item>
     <item row="3" column="0">
+     <widget class="QPushButton" name="start">
+      <property name="text">
+       <string>Iniciar</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
      <widget class="QLabel" name="webcam">
       <property name="enabled">
        <bool>true</bool>
@@ -53,21 +109,8 @@
       </property>
      </widget>
     </item>
-    <item row="4" column="0">
-     <widget class="QPushButton" name="start">
-      <property name="text">
-       <string>Iniciar</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="1">
-     <widget class="QLabel" name="instructions">
-      <property name="maximumSize">
-       <size>
-        <width>350</width>
-        <height>50</height>
-       </size>
-      </property>
+    <item row="0" column="0">
+     <widget class="QLabel" name="label">
       <property name="font">
        <font>
         <pointsize>10</pointsize>
@@ -75,11 +118,8 @@
         <bold>true</bold>
        </font>
       </property>
-      <property name="layoutDirection">
-       <enum>Qt::LeftToRight</enum>
-      </property>
       <property name="text">
-       <string>Por favor sientate como se muestra en la imagen</string>
+       <string>Antes de iniciar asegurate de que la computadora detecte tu cara y veas puntos rojos sobre ella</string>
       </property>
       <property name="scaledContents">
        <bool>true</bool>
@@ -87,22 +127,21 @@
       <property name="alignment">
        <set>Qt::AlignCenter</set>
       </property>
-      <property name="margin">
-       <number>0</number>
+      <property name="wordWrap">
+       <bool>true</bool>
       </property>
      </widget>
     </item>
-    <item row="4" column="1">
-     <widget class="QLabel" name="counter">
-      <property name="font">
-       <font>
-        <pointsize>11</pointsize>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
+    <item row="1" column="1">
+     <widget class="QLabel" name="pose">
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>10</height>
+       </size>
       </property>
       <property name="text">
-       <string>5</string>
+       <string/>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
