@@ -65,7 +65,7 @@ class MainWindow(QtWidgets.QMainWindow, SlotsMixin, ThreadsMixin):
         self.current_pose = _img_description
         self.ui.pose.setText(self.current_pose)
         self.poses_index += 1
-        self.counter()
+        self.counter(time=10)
 
     def next(self):
         if self.active:
