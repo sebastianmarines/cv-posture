@@ -3,7 +3,6 @@
     <br>
     <span>Stance</span>
 </h1>
-<hr>
 <p>
   <a href="https://github.com/sebastianmarines/stance/blob/master/LICENSE" target="_blank">
     <img alt="License: AGPL--3.0" src="https://img.shields.io/badge/License-AGPL--3.0-yellow.svg" />
